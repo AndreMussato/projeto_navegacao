@@ -27,3 +27,15 @@ export const createUserSchema = z.object({
             .min(6, { message: "A senha deve ter no mínimo 6 caracteres"}),
     }),
 });
+
+//Cria um schema de validação para login de usuário
+export const authUserSchema = z.object({
+    body: z.object({
+        //Define que deve ser uma string no formato de email válido
+        email: z.email({ message: "Precisa ser um email válido"}),
+        password: z.
+            string({ message: "A senha é obrigatória"})
+            //Define que deve ter no mínimo 1 caracter
+            .min(1, { message: "A senha é obrigatória"})
+    })
+})

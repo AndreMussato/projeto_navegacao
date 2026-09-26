@@ -38,10 +38,73 @@ model Category {
   createdAt DateTime @default(now()) //Data de criação
   updatedAt DateTime @updatedAt //Atualiza automaticamente ao modificar o registro
 
+  products Product[] //Relação: uma categoria pode ter vários produtos
+
   @@map("categories") //Nome da tabela no banco
 }
 
 //Modelo de produtos
 model Product {
-  //CONTINUAR DAQUI ;)
+  id String @id @default(uuid()) //ID único
+  name String //Nome do Produto
+  price Int //Preço em centavos (ex: 1000 = R$10,00)
+  description String //Descrição do produto
+  banner String //URL ou o caminho da imagem do produto
+  disabled Boolean @default(false) //Indica se o produto está desativado
+
+  items Item[] //Relação com itens de pedidos
+
+  category_id String //Chave estrangeira da categoria
+  category Category @relation(fields: [category_id], references: [id], onDelete: Cascade) 
+  //Relação: um produto pertence a uma categoria
+  //onDelete: cascade - se a categoria for deletada, os produtos também serão
+
+  createdAt DateTime @default(now()) //Data de criação
+  updatedAt DateTime @updatedAt //Atualiza automaticamente ao modificar o registro
+
+  @@map("products") //Nome da tabela no banco
+}
+
+//Modelo de pedidos
+model Order {
+  id String @id @default(uuid()) //ID único
+  table Int //Número da mesa
+
+  status Boolean @default(false)
+  //Status do pedido
+  //false = Pendente
+  //true = Pronto
+
+  draft Boolean @default(true)
+  //Indica se ainda é um rascunho:
+  //true = ainda não enviado
+  //false = enviado para a cozinha
+
+  name String? //Nome do cliente (OPCIONAL)
+
+  items Item[] //Relação: um pedido pode ter vários itens
+
+  createdAt DateTime @default(now()) //Data de criação
+  updatedAt DateTime @updatedAt //Atualiza automaticamente ao modificar o registro
+
+  @@map("orders") //Nome da tabela no banco
+}
+
+//Modelo de itens do Pedido (Tabela intermediária entre Order e Product)
+model Item {
+  id String @id @default(uuid()) //ID único
+  amount Int //Quantidade do produto no pedido
+
+  createdAt DateTime @default(now()) //Data de criação
+  updatedAt DateTime @updatedAt //Atualiza automaticamente ao modificar o registro
+
+  order_id String //Chave estrangeira do pedido
+  order Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  //Relação com pedido (se deletar o pedido, os itens também são deletados)
+
+  product_id String //Chave estrangeira do produto
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  //Relação com produto (se deletar o produto, os itens também são deletados)
+
+  @@map("items") //Nome da tabela no banco
 }

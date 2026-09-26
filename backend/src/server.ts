@@ -5,7 +5,7 @@ import cors from "cors";
 import "dotenv/config";
 
 //Importa o Express (framework para criar o servidor)
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 
 //Importa as rotas definidas em outro arquivo
 import { router } from "./routes";
@@ -30,3 +30,21 @@ const PORT = process.env.PORT! || 3333;
 app.listen(PORT, () => {
     console.log("Servidor rodando na porta " + PORT);
 });
+
+//Middleware global de tratamento de erros do Express
+//Ele captura qualquer erro lançado na aplicação (ex: throw new Error)
+app.use((error: Error, _: Request, res: Response, next: NextFunction) => {
+    
+    //Verifica se o erro é uma instância da classe Error
+    if(error instanceof Error) {
+        //Retorna status 400 (erro do cliente) com a mensagem do erro
+        return res.status(400).json({
+            error: error.message,
+        })
+    }
+
+    //Caso não seja um erro conhecido, retorna erro genérico do servidor
+    return res.status(500).json({
+        error: "Internal server error!"
+    })
+})
